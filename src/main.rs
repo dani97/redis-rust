@@ -1,5 +1,24 @@
 #![allow(unused_imports)]
-use std::net::TcpListener;
+use std::{
+    fs::{self, read},
+    io::{prelude::*, BufReader},
+    net::{TcpListener, TcpStream}, process::Command,
+};
+
+fn handle_connection(mut stream: TcpStream) {
+    let mut buf_reader = BufReader::new(&mut stream);
+    let mut line = String::new();
+    let mut no_of_bytes = 0;
+    for _ in 1..4 {
+        line.clear();
+        no_of_bytes = buf_reader.read_line(&mut line).unwrap();
+        println!("{}", line);
+        println!("{}", no_of_bytes);
+    }
+    if line.eq("PING\r\n") {
+        stream.write(b"+PONG\r\n").unwrap();
+    } 
+}
 
 fn main() {
     // You can use print statements as follows for debugging, they'll be visible when running tests.
@@ -11,8 +30,8 @@ fn main() {
     
     for stream in listener.incoming() {
         match stream {
-            Ok(_stream) => {
-                println!("accepted new connection");
+            Ok(mut stream) => {
+                handle_connection(stream);
             }
             Err(e) => {
                 println!("error: {}", e);
