@@ -46,7 +46,7 @@ fn main() {
     
     for stream in listener.incoming() {
         match stream {
-            Ok(mut stream) => {
+            Ok(stream) => {
                 let handle = thread::spawn(|| {
                     handle_connection(stream);
                 });
